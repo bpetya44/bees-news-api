@@ -69,7 +69,7 @@ newspapers.forEach( newspaper =>{
         .then(response =>{
             const html =response.data;
             const $ = cheerio.load(html)
-            $('a:contains("bee")', html).each(function(){
+            $('a:contains("bees")', html).each(function(){
                 const title = $(this).text()
                 const url = $(this).attr('href')
                 articles.push({
@@ -82,7 +82,7 @@ newspapers.forEach( newspaper =>{
 })
 
 app.get('/', (req, res)=>{
-    res.json('Welcome to the Bees News API. Get with /news route');
+    res.json('Welcome to the Bees News API. Get with /news all of them, or just for a specific newspaper use route /news/thetimes');
 })
 
 //get the news
@@ -90,13 +90,13 @@ app.get('/news', (req, res) => {
     res.json(articles);
 })
 
-//get the news from just one article
-app.get('news/:newspaperID', async (req, res)=>{
-    console.log(req.params.newspaperID);
+//get the news from just one newspaper
+app.get('/news/:newspaperID', (req, res)=>{
+    //console.log(req.params.newspaperID);
     const newspaperID = req.params.newspaperID;
 
     const newspaperAddress = newspapers.filter(newspaper => newspaper.name == newspaperID)[0].address //if we get the name and the Id matching we put this in variable
-    console.log(newspaperAddress);
+    // console.log(newspaperAddress);
 
     const newspaperBase = newspapers.filter(newspaper => newspaper.name == newspaperID)[0].base
     // const newspaperURL = newspapers.filter(newspaper => newspaper.name == newspaperID)[0].url
@@ -106,18 +106,19 @@ app.get('news/:newspaperID', async (req, res)=>{
             const html = response.data
             const $ = cheerio.load(html)
             const specificArticles = []
-            $('a:contains("bee")', html).each(function(){
+            $('a:contains("bees")', html).each(function(){
                 const title = $(this).text()
                 const url = $(this).attr('href')
                 specificArticles.push({
                     title,
                     url: newspaperBase + url,
                     source: newspaperID
-                })
+                })//.replace(/\\n\s+/gm, '').trim()
             })
             res.json(specificArticles)
+            
         }).catch(err => console.log(err))
-
-})
+        
+    })
 
 app.listen(PORT, ()=> console.log(`Server running on ${PORT}`))
